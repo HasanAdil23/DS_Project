@@ -1,7 +1,9 @@
 #include <SFML/Graphics.hpp>
+#include "menu.h""
 #include "/GitHubFolder/DS_Project/test.cpp"
 #include <time.h>
 using namespace sf;
+using namespace std;
 
 const int M = 25;
 const int N = 40;
@@ -36,14 +38,42 @@ void drop(int y, int x)
     if (grid[y][x + 1] == 0) drop(y, x + 1);
 }
 
-int main()
-{
-    dummy();
+//^^ These functions were given in the skeleton code
+
+int main() {
     srand(time(0));
 
-    RenderWindow window(VideoMode(N * ts, M * ts), "Xonix Game!");
+    RenderWindow window(VideoMode(N * ts, M * ts), "XONIX");
     window.setFramerateLimit(60);
 
+    // --- Show menu before starting the game ---
+    GameMenu menu(window);
+    int menuChoice = -2;
+    
+    while (window.isOpen() && menuChoice != 0)
+    {
+        menuChoice = menu.handleInput();
+        menu.drawMenu();
+
+        if (menuChoice == 1)
+        {
+            std::cout << "Showing personal highscores (not implemented yet)\n";
+            menuChoice = -2; // Reset to stay in menu
+        }
+        else if (menuChoice == 2)
+        {
+            std::cout << "Showing leaderboard (not implemented yet)\n";
+            menuChoice = -2;
+        }
+        else if (menuChoice == 3)
+        {
+            window.close(); // Quit
+        }
+    }
+
+    if (menuChoice != 0 || !window.isOpen()) return 0; // Don't start game if quit
+
+    // --- Load game assets ---
     Texture t1, t2, t3;
     t1.loadFromFile("images/tiles.png");
     t2.loadFromFile("images/gameover.png");
@@ -61,49 +91,42 @@ int main()
     float timer = 0, delay = 0.07;
     Clock clock;
 
+    // --- Initialize borders ---
     for (int i = 0; i < M; i++)
         for (int j = 0; j < N; j++)
-            if (i == 0 || j == 0 || i == M - 1 || j == N - 1)  grid[i][j] = 1;
+            if (i == 0 || j == 0 || i == M - 1 || j == N - 1) grid[i][j] = 1;
 
-    while (window.isOpen())
-    {
+    // --- Main Game Loop ---
+    while (window.isOpen()) {
         float time = clock.getElapsedTime().asSeconds();
         clock.restart();
         timer += time;
 
         Event e;
-        while (window.pollEvent(e))
-        {
+        while (window.pollEvent(e)) {
             if (e.type == Event::Closed)
                 window.close();
 
-            if (e.type == Event::KeyPressed)
-                if (e.key.code == Keyboard::Escape)
-                {
-                    for (int i = 1; i < M - 1; i++)
-                        for (int j = 1; j < N - 1; j++)
-                            grid[i][j] = 0;
-
-                    x = 10; y = 0;
-                    Game = true;
-                }
+            if (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape) {
+                for (int i = 1; i < M - 1; i++)
+                    for (int j = 1; j < N - 1; j++)
+                        grid[i][j] = 0;
+                x = 10; y = 0; Game = true;
+            }
         }
 
-        if (Keyboard::isKeyPressed(Keyboard::Left)) { dx = -1; dy = 0; };
-        if (Keyboard::isKeyPressed(Keyboard::Right)) { dx = 1; dy = 0; };
-        if (Keyboard::isKeyPressed(Keyboard::Up)) { dx = 0; dy = -1; };
-        if (Keyboard::isKeyPressed(Keyboard::Down)) { dx = 0; dy = 1; };
+        if (Keyboard::isKeyPressed(Keyboard::Left)) { dx = -1; dy = 0; }
+        if (Keyboard::isKeyPressed(Keyboard::Right)) { dx = 1; dy = 0; }
+        if (Keyboard::isKeyPressed(Keyboard::Up)) { dx = 0; dy = -1; }
+        if (Keyboard::isKeyPressed(Keyboard::Down)) { dx = 0; dy = 1; }
 
         if (!Game) continue;
 
-        if (timer > delay)
-        {
+        if (timer > delay) {
             x += dx;
             y += dy;
-
             if (x < 0) x = 0; if (x > N - 1) x = N - 1;
             if (y < 0) y = 0; if (y > M - 1) y = M - 1;
-
             if (grid[y][x] == 2) Game = false;
             if (grid[y][x] == 0) grid[y][x] = 2;
             timer = 0;
@@ -111,13 +134,10 @@ int main()
 
         for (int i = 0; i < enemyCount; i++) a[i].move();
 
-        if (grid[y][x] == 1)
-        {
+        if (grid[y][x] == 1) {
             dx = dy = 0;
-
             for (int i = 0; i < enemyCount; i++)
                 drop(a[i].y / ts, a[i].x / ts);
-
             for (int i = 0; i < M; i++)
                 for (int j = 0; j < N; j++)
                     if (grid[i][j] == -1) grid[i][j] = 0;
@@ -127,12 +147,10 @@ int main()
         for (int i = 0; i < enemyCount; i++)
             if (grid[a[i].y / ts][a[i].x / ts] == 2) Game = false;
 
-        /////////draw//////////
+        // Draw everything
         window.clear();
-
         for (int i = 0; i < M; i++)
-            for (int j = 0; j < N; j++)
-            {
+            for (int j = 0; j < N; j++) {
                 if (grid[i][j] == 0) continue;
                 if (grid[i][j] == 1) sTile.setTextureRect(IntRect(0, 0, ts, ts));
                 if (grid[i][j] == 2) sTile.setTextureRect(IntRect(54, 0, ts, ts));
@@ -145,14 +163,12 @@ int main()
         window.draw(sTile);
 
         sEnemy.rotate(10);
-        for (int i = 0; i < enemyCount; i++)
-        {
+        for (int i = 0; i < enemyCount; i++) {
             sEnemy.setPosition(a[i].x, a[i].y);
             window.draw(sEnemy);
         }
 
         if (!Game) window.draw(sGameover);
-
         window.display();
     }
 
