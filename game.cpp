@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
-#include "menu.h""
+#include "menu.h"
+#include <iostream>
 #include "/GitHubFolder/DS_Project/test.cpp"
 #include <time.h>
 using namespace sf;
@@ -49,7 +50,7 @@ int main() {
     // --- Show menu before starting the game ---
     GameMenu menu(window);
     int menuChoice = -2;
-    
+
     while (window.isOpen() && menuChoice != 0)
     {
         menuChoice = menu.handleInput();
