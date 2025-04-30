@@ -47,6 +47,7 @@ int main() {
     RenderWindow window(VideoMode(N * ts, M * ts), "XONIX");
     window.setFramerateLimit(60);
 
+    // Show menu before starting the game
     GameMenu menu(window);
     int menuChoice = -2;
 
