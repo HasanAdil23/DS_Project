@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "menu.h"
+#include "scoresystem.h"
 #include <iostream>
 #include "/GitHubFolder/DS_Project/test.cpp"
 #include <time.h>
@@ -40,41 +41,37 @@ void drop(int y, int x)
 }
 
 //^^ These functions were given in the skeleton code
-
 int main() {
     srand(time(0));
 
     RenderWindow window(VideoMode(N * ts, M * ts), "XONIX");
     window.setFramerateLimit(60);
 
-    // --- Show menu before starting the game ---
     GameMenu menu(window);
     int menuChoice = -2;
 
-    while (window.isOpen() && menuChoice != 0)
-    {
+    while (window.isOpen() && menuChoice != 0) {
         menuChoice = menu.handleInput();
         menu.drawMenu();
 
-        if (menuChoice == 1)
-        {
-            std::cout << "Showing personal highscores (not implemented yet)\n";
-            menuChoice = -2; // Reset to stay in menu
+        if (menuChoice == 1) {
+            std::cout << "Showing personal highscores:\n";
+            ScoreSystem tempScores;
+            tempScores.loadFromFile();
+            menuChoice = -2;
         }
-        else if (menuChoice == 2)
-        {
+        else if (menuChoice == 2) {
             std::cout << "Showing leaderboard (not implemented yet)\n";
             menuChoice = -2;
         }
-        else if (menuChoice == 3)
-        {
-            window.close(); // Quit
+        else if (menuChoice == 3) {
+            window.close();
         }
     }
 
-    if (menuChoice != 0 || !window.isOpen()) return 0; // Don't start game if quit
+    if (menuChoice != 0 || !window.isOpen()) return 0;
 
-    // --- Load game assets ---
+    // Load game assets
     Texture t1, t2, t3;
     t1.loadFromFile("images/tiles.png");
     t2.loadFromFile("images/gameover.png");
@@ -92,12 +89,16 @@ int main() {
     float timer = 0, delay = 0.07;
     Clock clock;
 
-    // --- Initialize borders ---
+    // Initialize grid borders
     for (int i = 0; i < M; i++)
         for (int j = 0; j < N; j++)
-            if (i == 0 || j == 0 || i == M - 1 || j == N - 1) grid[i][j] = 1;
+            if (i == 0 || j == 0 || i == M - 1 || j == N - 1)
+                grid[i][j] = 1;
 
-    // --- Main Game Loop ---
+    // Initialize score system
+    ScoreSystem scoreSystem;
+
+    // Main Game Loop
     while (window.isOpen()) {
         float time = clock.getElapsedTime().asSeconds();
         clock.restart();
@@ -113,6 +114,7 @@ int main() {
                     for (int j = 1; j < N - 1; j++)
                         grid[i][j] = 0;
                 x = 10; y = 0; Game = true;
+                scoreSystem.reset();
             }
         }
 
@@ -126,10 +128,17 @@ int main() {
         if (timer > delay) {
             x += dx;
             y += dy;
+
             if (x < 0) x = 0; if (x > N - 1) x = N - 1;
             if (y < 0) y = 0; if (y > M - 1) y = M - 1;
+
             if (grid[y][x] == 2) Game = false;
-            if (grid[y][x] == 0) grid[y][x] = 2;
+
+            if (grid[y][x] == 0) {
+                grid[y][x] = 2;
+                scoreSystem.addPoints(1);  // <-- Add points for claiming tile
+            }
+
             timer = 0;
         }
 
@@ -146,10 +155,12 @@ int main() {
         }
 
         for (int i = 0; i < enemyCount; i++)
-            if (grid[a[i].y / ts][a[i].x / ts] == 2) Game = false;
+            if (grid[a[i].y / ts][a[i].x / ts] == 2)
+                Game = false;
 
-        // Draw everything
+        // Draw game
         window.clear();
+
         for (int i = 0; i < M; i++)
             for (int j = 0; j < N; j++) {
                 if (grid[i][j] == 0) continue;
@@ -169,7 +180,14 @@ int main() {
             window.draw(sEnemy);
         }
 
-        if (!Game) window.draw(sGameover);
+        // Show score
+        scoreSystem.draw(window);
+
+        if (!Game) {
+            window.draw(sGameover);
+            scoreSystem.saveToFile("Player");
+        }
+
         window.display();
     }
 
