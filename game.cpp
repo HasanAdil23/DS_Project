@@ -106,11 +106,13 @@ int main() {
         timer += time;
 
         Event e;
-        while (window.pollEvent(e)) {
+        while (window.pollEvent(e)) 
+        {
             if (e.type == Event::Closed)
                 window.close();
 
-            if (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape) {
+            if (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape) 
+            {
                 for (int i = 1; i < M - 1; i++)
                     for (int j = 1; j < N - 1; j++)
                         grid[i][j] = 0;
@@ -119,10 +121,10 @@ int main() {
             }
         }
 
-        if (Keyboard::isKeyPressed(Keyboard::Left)) { dx = -1; dy = 0; }
+        if (Keyboard::isKeyPressed(Keyboard::Left))  { dx = -1; dy = 0; }
         if (Keyboard::isKeyPressed(Keyboard::Right)) { dx = 1; dy = 0; }
-        if (Keyboard::isKeyPressed(Keyboard::Up)) { dx = 0; dy = -1; }
-        if (Keyboard::isKeyPressed(Keyboard::Down)) { dx = 0; dy = 1; }
+        if (Keyboard::isKeyPressed(Keyboard::Up))    { dx = 0; dy = -1; }
+        if (Keyboard::isKeyPressed(Keyboard::Down))  { dx = 0; dy = 1; }
 
         if (!Game) continue;
 

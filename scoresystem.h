@@ -2,8 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include "maxheap.h"
-#include "SFML/Graphics.hpp"
+#include "minheap.h"
 using namespace std;
 using namespace sf;
 
@@ -13,6 +12,7 @@ private:
     int score;
     sf::Font font;
     sf::Text scoreText;
+    minheap m1; //composition
 
 public:
     ScoreSystem();
@@ -24,7 +24,9 @@ public:
     void saveToFile(const std::string& playerName = "Player");
     void loadFromFile(); // optional, e.g., to show highscores. also uses max heap
   
-    void sortScores() {
+    //hasan this is currently illegal. i think we're suppossed to sort using min and max heap
+    void sortScores() 
+    {
         const int MAX_ENTRIES = 100;
         int scores[MAX_ENTRIES];
         int count = 0;
@@ -42,9 +44,12 @@ public:
         inFile.close();
 
         // Bubble Sort (descending)
-        for (int i = 0; i < count - 1; ++i) {
-            for (int j = 0; j < count - i - 1; ++j) {
-                if (scores[j] < scores[j + 1]) {
+        for (int i = 0; i < count - 1; ++i) 
+        {
+            for (int j = 0; j < count - i - 1; ++j) 
+            {
+                if (scores[j] < scores[j + 1]) 
+                {
                     int temp = scores[j];
                     scores[j] = scores[j + 1];
                     scores[j + 1] = temp;
@@ -54,7 +59,8 @@ public:
 
         // Write sorted scores back to file
         std::ofstream outFile("scores.txt");
-        if (!outFile.is_open()) {
+        if (!outFile.is_open()) 
+        {
             std::cout << "Failed to open scores.txt for writing.\n";
             return;
         }
@@ -64,9 +70,27 @@ public:
         }
 
         outFile.close();
-        std::cout << "Scores sorted in descending order.\n";
+        //std::cout << "Scores sorted in descending order.\n";
     }
 
+    //a function that reads scores from file and inserts them into min heap 
+    void readScoresFromFile() 
+    {
+		std::ifstream inFile("scores.txt");
+		if (!inFile.is_open()) 
+        {
+			std::cout << "Failed to open scores.txt\n";
+			return;
+		}
+
+		int score;
+		while (inFile >> score)
+        {
+			m1.insert(score);
+		}
+		inFile.close();
+	}
+    
 
     void reset();
 };
@@ -107,10 +131,12 @@ void ScoreSystem::draw(sf::RenderWindow& window)
 void ScoreSystem::saveToFile(const std::string& playerName) 
 {
     std::ofstream file("scores.txt", std::ios::app);
-    if (file.is_open()) {
+    if (file.is_open()) 
+    {
         file  << score << std::endl;
         file.close();
     }
+    sortScores(); 
 }
 
 void ScoreSystem::loadFromFile() 
