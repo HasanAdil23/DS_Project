@@ -1,8 +1,9 @@
 #include <SFML/Graphics.hpp>
+#include "login_signup.h"
 #include "menu.h"
 #include "scoresystem.h"
 #include <iostream>
-#include "/GitHubFolder/DS_Project/test.cpp"
+//#include ""
 #include <time.h>
 using namespace sf;
 using namespace std;
@@ -46,6 +47,11 @@ int main() {
 
     RenderWindow window(VideoMode(N * ts, M * ts), "XONIX");
     window.setFramerateLimit(60);
+
+    // --- Proceeding to Login/Signup before starting the game ---
+
+    if (!handleAuthentication(window))
+        return 0;
 
     // Show menu before starting the game
     GameMenu menu(window);
