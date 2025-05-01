@@ -1,9 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include "login_signup.h"
 #include "menu.h"
+#include "gameaudio.h"
 #include "scoresystem.h"
 #include <iostream>
-//#include ""
 #include <time.h>
 using namespace sf;
 using namespace std;
@@ -42,7 +42,9 @@ void drop(int y, int x)
 }
 
 //^^ These functions were given in the skeleton code
-int main() {
+int main() 
+{
+    cout << "working" << endl;
     srand(time(0));
 
     RenderWindow window(VideoMode(N * ts, M * ts), "XONIX");
@@ -52,31 +54,41 @@ int main() {
 
     if (!handleAuthentication(window))
         return 0;
-
+    GameAudio audio;
     // Show menu before starting the game
-    GameMenu menu(window);
+    GameMenu menu(window, &audio);
     int menuChoice = -2;
-
-    while (window.isOpen() && menuChoice != 0) {
+    
+    //option 0 is for play. and so on
+    while (window.isOpen() && menuChoice != 0) 
+    {
         menuChoice = menu.handleInput();
         menu.drawMenu();
 
-        if (menuChoice == 1) {
+        if (menuChoice == 1) 
+        {
             std::cout << "Showing personal highscores:\n";
             ScoreSystem tempScores;
             tempScores.loadFromFile();
             menuChoice = -2;
         }
-        else if (menuChoice == 2) {
+        else if (menuChoice == 2) 
+        {
             std::cout << "Showing leaderboard (not implemented yet)\n";
             menuChoice = -2;
         }
-        else if (menuChoice == 3) {
+        else if (menuChoice == 3) 
+        {
+            menu.audioPlayer->playQuitSoundAndExit(window); //windows xp wali awaaz yahan se chalti hai 
             window.close();
         }
     }
 
-    if (menuChoice != 0 || !window.isOpen()) return 0;
+    if (menuChoice != 0 || !window.isOpen())
+    {
+        
+        return 0;
+    }
 
     // Load game assets
     Texture t1, t2, t3;
@@ -104,37 +116,46 @@ int main() {
 
     // Initialize score system
     ScoreSystem scoreSystem;
-
+    menu.stopaudio();   //stopping the menu audio
+    audio.playBackgroundMusic();    //playing the game music
     // Main Game Loop
-    while (window.isOpen()) {
+    while (window.isOpen()) 
+    {
         float time = clock.getElapsedTime().asSeconds();
         clock.restart();
         timer += time;
 
         Event e;
-        while (window.pollEvent(e)) 
+        while (window.pollEvent(e))
         {
             if (e.type == Event::Closed)
                 window.close();
 
-            if (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape) 
+            if (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape)
             {
                 for (int i = 1; i < M - 1; i++)
                     for (int j = 1; j < N - 1; j++)
                         grid[i][j] = 0;
-                x = 10; y = 0; Game = true;
+
+                x = 10; y = 0;
+                Game = true;
                 scoreSystem.reset();
+
+                audio.stopBackgroundMusic();       // Ensure any existing music stops
+                audio.playBackgroundMusic();       // Start music again
             }
+
         }
 
-        if (Keyboard::isKeyPressed(Keyboard::Left))  { dx = -1; dy = 0; }
+        if (Keyboard::isKeyPressed(Keyboard::Left)) { dx = -1; dy = 0; }
         if (Keyboard::isKeyPressed(Keyboard::Right)) { dx = 1; dy = 0; }
-        if (Keyboard::isKeyPressed(Keyboard::Up))    { dx = 0; dy = -1; }
-        if (Keyboard::isKeyPressed(Keyboard::Down))  { dx = 0; dy = 1; }
+        if (Keyboard::isKeyPressed(Keyboard::Up)) { dx = 0; dy = -1; }
+        if (Keyboard::isKeyPressed(Keyboard::Down)) { dx = 0; dy = 1; }
 
         if (!Game) continue;
 
-        if (timer > delay) {
+        if (timer > delay) 
+        {
             x += dx;
             y += dy;
 
@@ -143,7 +164,8 @@ int main() {
 
             if (grid[y][x] == 2) Game = false;
 
-            if (grid[y][x] == 0) {
+            if (grid[y][x] == 0) 
+            {
                 grid[y][x] = 2;
                 scoreSystem.addPoints(1);  // <-- Add points for claiming tile
             }
@@ -153,7 +175,8 @@ int main() {
 
         for (int i = 0; i < enemyCount; i++) a[i].move();
 
-        if (grid[y][x] == 1) {
+        if (grid[y][x] == 1) 
+        {
             dx = dy = 0;
             for (int i = 0; i < enemyCount; i++)
                 drop(a[i].y / ts, a[i].x / ts);
@@ -171,7 +194,8 @@ int main() {
         window.clear();
 
         for (int i = 0; i < M; i++)
-            for (int j = 0; j < N; j++) {
+            for (int j = 0; j < N; j++) 
+            {
                 if (grid[i][j] == 0) continue;
                 if (grid[i][j] == 1) sTile.setTextureRect(IntRect(0, 0, ts, ts));
                 if (grid[i][j] == 2) sTile.setTextureRect(IntRect(54, 0, ts, ts));
@@ -184,7 +208,8 @@ int main() {
         window.draw(sTile);
 
         sEnemy.rotate(10);
-        for (int i = 0; i < enemyCount; i++) {
+        for (int i = 0; i < enemyCount; i++) 
+        {
             sEnemy.setPosition(a[i].x, a[i].y);
             window.draw(sEnemy);
         }
@@ -192,8 +217,11 @@ int main() {
         // Show score
         scoreSystem.draw(window);
 
-        if (!Game) {
+        if (!Game) 
+        {
             window.draw(sGameover);
+            audio.stopBackgroundMusic();
+            audio.playGameOverSound();
             scoreSystem.saveToFile("Player");
         }
 

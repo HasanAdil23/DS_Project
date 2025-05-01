@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "gameaudio.h"  //music chalana hai 
 #include <ctime>
 #include <cstdlib>
 
@@ -33,6 +34,8 @@ bool handleAuthentication(RenderWindow& window)
     else 
     {
         backgroundSprite.setTexture(backgroundTexture);
+        backgroundSprite.setColor(sf::Color(255, 255, 255, 120)); // 120/255 = ~47% opacity
+
     }
 
     Font font;
@@ -83,6 +86,9 @@ bool handleAuthentication(RenderWindow& window)
     bool typingName = true;
     bool typingPass = false;
 
+    GameAudio loginmusic;
+    loginmusic.playLoginmusic();
+
     while (window.isOpen()) 
     {
         Event e;
@@ -117,13 +123,18 @@ bool handleAuthentication(RenderWindow& window)
                         }
                         fin.close();
 
-                        if (found) 
+                        if (found)
+                        {
+                            loginmusic.stoploginMusic();
                             return true;
+                        }
+                           
 
                         else
                         {
                             errorMsg.setString("Invalid credentials!");
                             showSignupOption = true;
+                            loginmusic.playLoginErrorSoundWithPauseResume();
                         }
                     }
 
