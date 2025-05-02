@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Audio.hpp>
+#include <sstream>
 #include <iostream>
 using namespace std;
 using namespace sf;
@@ -18,7 +19,8 @@ private:
     Sound loginErrorSound;
     SoundBuffer quitSoundBuffer;
     Sound quitSound;
-
+    Music endmenumusic;
+    
 
 public:
     GameAudio();
@@ -34,6 +36,8 @@ public:
     void stoploginMusic();
     void playLoginErrorSoundWithPauseResume();
     void playQuitSoundAndExit(RenderWindow& window);
+    void playQuitSound();
+    void stopQuitSound();
 
 };
 
@@ -83,6 +87,11 @@ bool GameAudio::loadSounds()
         return false;
     }
 
+    if (!endmenumusic.openFromFile("Audios/(Music) Shinobi - BGM 1 (Arcade).wav"))
+    {
+        cerr << "End menu music is not being loaded" << endl;
+    }    
+
     loginErrorSound.setBuffer(loginErrorBuffer);
     quitSound.setBuffer(quitSoundBuffer);
 
@@ -92,21 +101,37 @@ bool GameAudio::loadSounds()
     return true;
 }
 
-void GameAudio::playNavigationSound() {
+void GameAudio::playQuitSound()
+{
+    endmenumusic.setLoop(true);
+    endmenumusic.setVolume(100);
+    endmenumusic.play();
+}
+
+void GameAudio::stopQuitSound()
+{
+    endmenumusic.stop();
+}
+
+void GameAudio::playNavigationSound() 
+{
     navSound.play();
 }
 
-void GameAudio::playGameOverSound() {
+void GameAudio::playGameOverSound() 
+{
     gameOverSound.play();
 }
 
-void GameAudio::playBackgroundMusic() {
+void GameAudio::playBackgroundMusic() 
+{
     backgroundMusic.setLoop(true);
     backgroundMusic.setVolume(100); 
     backgroundMusic.play();
 }
 
-void GameAudio::stopBackgroundMusic() {
+void GameAudio::stopBackgroundMusic() 
+{
     backgroundMusic.stop();
 }
 

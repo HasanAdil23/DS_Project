@@ -1,6 +1,7 @@
-#include <SFML/Graphics.hpp>
+﻿#include <SFML/Graphics.hpp>
 #include "login_signup.h"
 #include "menu.h"
+#include "endmenu.h"
 #include "gameaudio.h"
 #include "scoresystem.h"
 #include <iostream>
@@ -41,6 +42,15 @@ void drop(int y, int x)
     if (grid[y][x + 1] == 0) drop(y, x + 1);
 }
 
+void gridreset()
+{
+    // Reset grid to initial state
+    for (int i = 0; i < M; ++i)
+        for (int j = 0; j < N; ++j)
+            grid[i][j] = (i == 0 || j == 0 || i == M - 1 || j == N - 1) ? 1 : 0;
+
+}
+
 //^^ These functions were given in the skeleton code
 int main() 
 {
@@ -54,6 +64,10 @@ int main()
 
     if (!handleAuthentication(window))
         return 0;
+    //this is a goto label, that i have created. used when user returns from the exitscreen
+exit:
+    // Reset grid to initial state (added because of the end menu)
+    gridreset();
     GameAudio audio;
     // Show menu before starting the game
     GameMenu menu(window, &audio);
@@ -216,17 +230,34 @@ int main()
 
         // Show score
         scoreSystem.draw(window);
-
-        if (!Game) 
+        int scorefordisp = scoreSystem.getScore();
+        if (!Game)
         {
             window.draw(sGameover);
             audio.stopBackgroundMusic();
             audio.playGameOverSound();
             scoreSystem.saveToFile("Player");
+            window.display(); // Make sure the GAME OVER screen is seen
+
+            sf::sleep(sf::seconds(2.5f)); // Short pause before EndMenu
+
+            // Show End Menu
+            EndMenu endMenu(window, scorefordisp, &audio);
+            int choice = -2;
+            while (choice == -2 && window.isOpen()) 
+            {
+                choice = endMenu.handleInput();
+                endMenu.draw();
+            }
+            // choice will always be 0 → Return to main
+            goto exit; // to restart at the main menu
+            
+
+            break; // In case the game loop is still running
         }
+
 
         window.display();
     }
-
     return 0;
 }

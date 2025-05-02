@@ -18,7 +18,7 @@ public:
     ScoreSystem();
 
     void addPoints(int points);
-    int getScore() const;
+    int getScore()const ;
 
     void draw(sf::RenderWindow& window);
     void saveToFile(const std::string& playerName = "Player");
@@ -112,7 +112,7 @@ ScoreSystem::ScoreSystem() : score(0) {
 void ScoreSystem::addPoints(int points) 
 {
     score += points;
-
+    cout << "Score: " << score << endl;
     stringstream ss;
     ss << "Score: " << score;
     scoreText.setString(ss.str());

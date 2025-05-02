@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <iostream>
@@ -33,8 +33,7 @@ public:
 };
 
 // Constructor
-GameMenu::GameMenu(sf::RenderWindow& win, GameAudio* audio)
-    : window(win), selectedItemIndex(0), audioPlayer(audio)
+GameMenu::GameMenu(sf::RenderWindow& win, GameAudio* audio): window(win), selectedItemIndex(0), audioPlayer(audio)
 {
     loadResources();
     setupMenu();
@@ -43,11 +42,22 @@ GameMenu::GameMenu(sf::RenderWindow& win, GameAudio* audio)
 
 // Load background and font
 void GameMenu::loadResources() {
+    
     if (!backgroundTexture.loadFromFile("images/t1.jpg")) {
         std::cerr << "Failed to load background image\n";
     }
-    backgroundSprite.setTexture(backgroundTexture);
-    backgroundSprite.setColor(sf::Color(255, 255, 255, 100)); // Semi-transparent
+    else {
+        backgroundSprite.setTexture(backgroundTexture);
+        backgroundSprite.setColor(sf::Color(255, 255, 255, 100)); // Optional: transparency
+
+        // 🔥 Scale background to fit the window
+        Vector2u textureSize = backgroundTexture.getSize();
+        Vector2u windowSize = window.getSize();
+        backgroundSprite.setScale(
+            float(windowSize.x) / textureSize.x,
+            float(windowSize.y) / textureSize.y
+        );
+    }
 
     if (!font.loadFromFile("Fonts/super-legend-boy-font/SuperLegendBoy-4w8Y.ttf")) {
         std::cerr << "Failed to load font\n";

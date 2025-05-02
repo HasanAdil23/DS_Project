@@ -25,26 +25,25 @@ bool handleAuthentication(RenderWindow& window)
 
     Texture backgroundTexture;
     Sprite backgroundSprite;
-
-    if (!backgroundTexture.loadFromFile("images/t1.jpg"))
-    {
-        cout << "Background image not found.\n";
+    if (!backgroundTexture.loadFromFile("images/t1.jpg")) {
+        std::cerr << "Failed to load background image\n";
     }
-
-    else 
-    {
+    else {
         backgroundSprite.setTexture(backgroundTexture);
-        backgroundSprite.setColor(sf::Color(255, 255, 255, 120)); // 120/255 = ~47% opacity
+        backgroundSprite.setColor(sf::Color(255, 255, 255, 100)); // Optional: transparency
 
+        //making it fit
+        Vector2u textureSize = backgroundTexture.getSize();
+        Vector2u windowSize = window.getSize();
+        backgroundSprite.setScale(
+            float(windowSize.x) / textureSize.x,
+            float(windowSize.y) / textureSize.y
+        );
     }
-
     Font font;
-
-    if (!font.loadFromFile("Fonts/super-legend-boy-font/SuperLegendBoy-4w8Y.ttf"))
-    {
-        cout << "Failed to load font.\n";
+    if (!font.loadFromFile("Fonts/super-legend-boy-font/SuperLegendBoy-4w8Y.ttf")) {
+        std::cerr << "Failed to load font\n";
     }
-
     Text title1("XONIX Login", font, 30);          
     title1.setPosition(235, 30);
 
