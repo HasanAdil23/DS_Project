@@ -15,6 +15,11 @@ const int N = 40;
 int grid[M][N] = { 0 };
 int ts = 18; //tile size
 
+//powerup 
+bool enemiesFrozen = false;
+float freezeTimer = 0.0f;
+
+
 struct Enemy
 {
     int x, y, dx, dy;
@@ -136,6 +141,16 @@ exit:
     while (window.isOpen()) 
     {
         float time = clock.getElapsedTime().asSeconds();
+        //powerup 
+        if (enemiesFrozen) 
+        {
+            freezeTimer -= time;
+           //counts down frame by frame, as per 60fps
+            if (freezeTimer <= 0.0f) {
+                enemiesFrozen = false;
+            }
+        }
+
         clock.restart();
         timer += time;
 
@@ -159,6 +174,14 @@ exit:
                 audio.playBackgroundMusic();       // Start music again
             }
 
+            //power up handling. Key: P nika howay ya wada howay
+            if (e.type == Event::KeyPressed && e.key.code == Keyboard::P) {
+                if (!enemiesFrozen && scoreSystem.getPowerUpCount() > 0) {
+                    scoreSystem.usePowerUp();
+                    enemiesFrozen = true;
+                    freezeTimer = 3.0; // 3 seconds
+                }
+            }
         }
 
         if (Keyboard::isKeyPressed(Keyboard::Left)) { dx = -1; dy = 0; }
@@ -187,17 +210,51 @@ exit:
             timer = 0;
         }
 
-        for (int i = 0; i < enemyCount; i++) a[i].move();
+        //enemies can only move if they are not frozen. powerup logic
+        if (!enemiesFrozen) 
+        {
+            for (int i = 0; i < enemyCount; i++) 
+            {
+                a[i].move();
+            }
+        }
 
-        if (grid[y][x] == 1) 
+        if (grid[y][x] == 1)
         {
             dx = dy = 0;
-            for (int i = 0; i < enemyCount; i++)
-                drop(a[i].y / ts, a[i].x / ts);
-            for (int i = 0; i < M; i++)
-                for (int j = 0; j < N; j++)
-                    if (grid[i][j] == -1) grid[i][j] = 0;
-                    else grid[i][j] = 1;
+
+            // Clear previous -1 in case of bug
+            for (int i = 0; i < M; ++i)
+                for (int j = 0; j < N; ++j)
+                    if (grid[i][j] == -1)
+                        grid[i][j] = 0;
+
+            // Mark accessible area from each enemy
+            for (int i = 0; i < enemyCount; i++) {
+                int ey = a[i].y / ts;
+                int ex = a[i].x / ts;
+                if (grid[ey][ex] == 0)
+                    drop(ey, ex);
+            }
+
+            int captured = 0;
+            for (int i = 0; i < M; i++) {
+                for (int j = 0; j < N; j++) {
+                    if (grid[i][j] == -1) {
+                        grid[i][j] = 0;
+                    }
+                    else if (grid[i][j] == 2) {
+                        grid[i][j] = 1;
+                        captured++;
+                    }
+                    else if (grid[i][j] == 0) {
+                        grid[i][j] = 1;
+                        captured++;
+                    }
+                }
+            }
+            // Apply points with bonus logic
+            scoreSystem.processCapturedTiles(captured);
         }
 
         for (int i = 0; i < enemyCount; i++)

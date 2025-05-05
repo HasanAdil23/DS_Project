@@ -41,9 +41,11 @@ GameMenu::GameMenu(sf::RenderWindow& win, GameAudio* audio): window(win), select
 }
 
 // Load background and font
-void GameMenu::loadResources() {
+void GameMenu::loadResources() 
+{
     
-    if (!backgroundTexture.loadFromFile("images/t1.jpg")) {
+    if (!backgroundTexture.loadFromFile("images/t1.jpg")) 
+    {
         std::cerr << "Failed to load background image\n";
     }
     else {

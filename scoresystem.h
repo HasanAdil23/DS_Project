@@ -13,7 +13,11 @@ private:
     sf::Font font;
     sf::Text scoreText;
     minheap m1; //composition
+    int rewardCounter;
+    int powerUps;
+    int lastPowerUpScore;
 
+    
 public:
     ScoreSystem();
 
@@ -23,7 +27,10 @@ public:
     void draw(sf::RenderWindow& window);
     void saveToFile(const std::string& playerName = "Player");
     void loadFromFile(); // optional, e.g., to show highscores. also uses max heap
-  
+    void processCapturedTiles(int tileCount); // Handles all bonus logic
+    int getPowerUpCount() const;
+    void usePowerUp(); // When used by player
+
     //hasan this is currently illegal. i think we're suppossed to sort using min and max heap
     void sortScores() 
     {
@@ -96,7 +103,9 @@ public:
 };
 
 
-ScoreSystem::ScoreSystem() : score(0) {
+
+ScoreSystem::ScoreSystem() :score(0), rewardCounter(0), powerUps(0), lastPowerUpScore(50)
+{
     if (!font.loadFromFile("Fonts/super-legend-boy-font/SuperLegendBoy-4w8Y.ttf")) {
         std::cerr << "Failed to load font for score\n";
     }
@@ -112,7 +121,7 @@ ScoreSystem::ScoreSystem() : score(0) {
 void ScoreSystem::addPoints(int points) 
 {
     score += points;
-    cout << "Score: " << score << endl;
+    //cout << "Score: " << score << endl;
     stringstream ss;
     ss << "Score: " << score;
     scoreText.setString(ss.str());
@@ -159,8 +168,49 @@ void ScoreSystem::loadFromFile()
     }
 }
 
+
+
+void ScoreSystem::processCapturedTiles(int tileCount) {
+    int bonus = 1;
+    if (rewardCounter >= 5 && tileCount > 5) {
+        bonus = 4;
+    }
+    else if (rewardCounter >= 3 && tileCount > 5) {
+        bonus = 2;
+        rewardCounter++;
+    }
+    else if (tileCount > 10) {
+        bonus = 2;
+        rewardCounter++;
+    }
+
+    addPoints(tileCount * bonus);
+
+    // Check if score threshold reached for power-up
+    while (score >= lastPowerUpScore + 30) {
+        powerUps++;
+        lastPowerUpScore += 30;
+        cout << "Power-Up awarded! Total: " << powerUps << "\n";
+    }
+}
+
+int ScoreSystem::getPowerUpCount() const {
+    return powerUps;
+}
+
+void ScoreSystem::usePowerUp() {
+    if (powerUps > 0) {
+        powerUps--;
+        std::cout << "Power-Up used! Remaining: " << powerUps << "\n";
+        // trigger 3s enemy freeze externally
+    }
+}
+
 void ScoreSystem::reset() 
 {
     score = 0;
+    rewardCounter = 0;
+    powerUps = 0;
+    lastPowerUpScore = 50;
     scoreText.setString("Score: 0");
 }
