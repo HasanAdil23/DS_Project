@@ -2,8 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "playerInfo.h"
-#include "playerInfo.cpp"
 #include "player_profile.h"
 #include "gameaudio.h"  //music chalana hai 
 #include <ctime>

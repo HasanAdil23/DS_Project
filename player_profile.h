@@ -24,22 +24,20 @@ public:
     Font font;
     Text nameText, idText, scoreText, themeText, titleText;
 
-    void loadPlayerScore() 
+    void loadPlayerScore()
     {
         totalScore = 0;
-        ifstream file("");
-        if (!file.is_open())
-            return;
 
-        char nameBuffer[100], idBuffer[100];
-        int score;
-        while (file >> nameBuffer >> idBuffer >> score)      //file reading for displaying total score
-        {
-            if (name == nameBuffer && ID == idBuffer)
-            {
-                totalScore += score;
-            }
+        // Build file path from ID
+        string filePath = "players/player_" + ID + ".txt";
+
+        ifstream file(filePath);
+        if (!file.is_open()) {
+            cout << "Couldn't open score file for player ID: " << ID << endl;
+            return;
         }
+
+        file >> totalScore; // Directly read the cumulative score
         file.close();
     }
 

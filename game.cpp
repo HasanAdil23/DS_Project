@@ -4,6 +4,8 @@
 #include "player_profile.h"
 #include "endmenu.h"
 #include "gameaudio.h"
+#include <string>
+#include "leaderboardMgmt.h"
 #include "scoresystem.h"
 #include <iostream>
 #include <time.h>
@@ -96,23 +98,32 @@ exit:
             loginPlayer.showProfile(window);
         }
 
-        else if (menuChoice == 2) 
+        else if (menuChoice == 2)
         {
-            cout << "Showing personal highscores:\n";
-            ScoreSystem tempScores;
-            tempScores.loadFromFile();
-            menuChoice = -2;
+            bool back = false;
+            while (!back && window.isOpen())
+            {
+                Event e;
+                while (window.pollEvent(e)) 
+                {
+                    if (e.type == Event::Closed)
+                        window.close();
+                    else if (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape)
+                        back = true;
+                }
+
+                window.clear();
+           
+            }
+            menuChoice = -2; // Return to menu loop
         }
+
+
         else if (menuChoice == 3) 
-        {
-            cout << "Showing leaderboard (not implemented yet)\n";
-            menuChoice = -2;
-        }
-        else if (menuChoice == 4) 
         {
             menu.audioPlayer->playQuitSoundAndExit(window); //windows xp wali awaaz yahan se chalti hai 
             window.close();
-        }
+        } 
     }
 
     if (menuChoice != 0 || !window.isOpen())
@@ -146,7 +157,8 @@ exit:
                 grid[i][j] = 1;
 
     // Initialize score system
-    ScoreSystem scoreSystem;
+    ScoreSystem scoreSystem(stoi(loginPlayer.ID), loginPlayer.name); // replace insertusername with actual name string
+
     menu.stopaudio();   //stopping the menu audio
     audio.playBackgroundMusic();    //playing the game music
     // Main Game Loop
@@ -304,8 +316,8 @@ exit:
         {
             window.draw(sGameover);
             audio.stopBackgroundMusic();
-            audio.playGameOverSound();
-            scoreSystem.saveToFile("Player");
+            audio.playGameOverSound(); 
+            scoreSystem.saveToFile();
             window.display(); // Make sure the GAME OVER screen is seen
 
             sf::sleep(sf::seconds(2.5f)); // Short pause before EndMenu
@@ -327,6 +339,7 @@ exit:
 
 
         window.display();
+
     }
     return 0;
 }

@@ -66,23 +66,19 @@ void GameMenu::loadResources()
 }
 
 // Setup menu items
+// Setup menu items
 void GameMenu::setupMenu() {
-    std::string options[] = { "PLAY", "Profile", "Highscores", "Leaderboard", "QUIT"};
+    std::string options[] = { "PLAY", "Profile", "Leaderboard", "QUIT" }; 
     float windowWidth = 40 * 18;
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 4; ++i) {
         menuItems[i].setFont(font);
         menuItems[i].setString(options[i]);
         menuItems[i].setCharacterSize(30);
 
-        sf::FloatRect textRect = menuItems[i].getLocalBounds();      //here we are deciding where to place the Play, Profile,
-                                                                    //Highscores etc. labels on the screen. 
-                                                                    //Pehly sirf 4 options thay, now 5, so quit option goes
-                                                                    // out of screen. yahan per positioning formulay se ho rhy
-                                                                    // so take a look at this issue.
-
+        sf::FloatRect textRect = menuItems[i].getLocalBounds();
         float x = (windowWidth - textRect.width) / 2.f;
-        float y = 200.f + i * 60.f;
+        float y = 150 + i * 60;
 
         menuItems[i].setPosition(x, y);
         menuItems[i].setFillColor(i == 0 ? sf::Color::Yellow : sf::Color::White);
@@ -94,16 +90,17 @@ void GameMenu::navigateMenu(sf::Keyboard::Key key) {
     menuItems[selectedItemIndex].setFillColor(sf::Color::White);
 
     if (key == sf::Keyboard::Up) {
-        selectedItemIndex = (selectedItemIndex - 1 + 5) % 5;
+        selectedItemIndex = (selectedItemIndex - 1 + 4) % 4; 
     }
     else if (key == sf::Keyboard::Down) {
-        selectedItemIndex = (selectedItemIndex + 1) % 5;
+        selectedItemIndex = (selectedItemIndex + 1) % 4; 
     }
 
-    if (audioPlayer) audioPlayer->playNavigationSound(); 
+    if (audioPlayer) audioPlayer->playNavigationSound();
 
     menuItems[selectedItemIndex].setFillColor(sf::Color::Yellow);
 }
+
 
 // Handle keyboard input
 int GameMenu::handleInput() {
