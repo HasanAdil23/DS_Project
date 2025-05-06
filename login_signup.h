@@ -2,6 +2,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "playerInfo.h"
+#include "playerInfo.cpp"
+#include "player_profile.h"
 #include "gameaudio.h"  //music chalana hai 
 #include <ctime>
 #include <cstdlib>
@@ -9,7 +12,7 @@
 using namespace sf;
 using namespace std;
 
-bool handleAuthentication(RenderWindow& window) 
+bool handleAuthentication(RenderWindow& window, string &loginName, string &loginID) 
 {
     enum Screens { LOGIN, SIGNUP };
     Screens currentScreen = LOGIN;
@@ -116,6 +119,10 @@ bool handleAuthentication(RenderWindow& window)
                             if (uname == inputName && pword == inputPass) 
                             {
                                 playerID = id;
+
+                                loginName = inputName;     //for player profile
+                                loginID = to_string(id);   //for player profile
+
                                 found = true;
                                 break;
                             }

@@ -12,7 +12,7 @@ private:
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
     sf::Font font;
-    sf::Text menuItems[4];
+    sf::Text menuItems[5];
     int selectedItemIndex;
     bool showAnimationDone = false;
 
@@ -52,7 +52,6 @@ void GameMenu::loadResources()
         backgroundSprite.setTexture(backgroundTexture);
         backgroundSprite.setColor(sf::Color(255, 255, 255, 100)); // Optional: transparency
 
-        // 🔥 Scale background to fit the window
         Vector2u textureSize = backgroundTexture.getSize();
         Vector2u windowSize = window.getSize();
         backgroundSprite.setScale(
@@ -68,15 +67,20 @@ void GameMenu::loadResources()
 
 // Setup menu items
 void GameMenu::setupMenu() {
-    std::string options[] = { "PLAY", "Highscores", "Leaderboard", "QUIT" };
+    std::string options[] = { "PLAY", "Profile", "Highscores", "Leaderboard", "QUIT"};
     float windowWidth = 40 * 18;
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 5; ++i) {
         menuItems[i].setFont(font);
         menuItems[i].setString(options[i]);
         menuItems[i].setCharacterSize(30);
 
-        sf::FloatRect textRect = menuItems[i].getLocalBounds();
+        sf::FloatRect textRect = menuItems[i].getLocalBounds();      //here we are deciding where to place the Play, Profile,
+                                                                    //Highscores etc. labels on the screen. 
+                                                                    //Pehly sirf 4 options thay, now 5, so quit option goes
+                                                                    // out of screen. yahan per positioning formulay se ho rhy
+                                                                    // so take a look at this issue.
+
         float x = (windowWidth - textRect.width) / 2.f;
         float y = 200.f + i * 60.f;
 
@@ -90,10 +94,10 @@ void GameMenu::navigateMenu(sf::Keyboard::Key key) {
     menuItems[selectedItemIndex].setFillColor(sf::Color::White);
 
     if (key == sf::Keyboard::Up) {
-        selectedItemIndex = (selectedItemIndex - 1 + 4) % 4;
+        selectedItemIndex = (selectedItemIndex - 1 + 5) % 5;
     }
     else if (key == sf::Keyboard::Down) {
-        selectedItemIndex = (selectedItemIndex + 1) % 4;
+        selectedItemIndex = (selectedItemIndex + 1) % 5;
     }
 
     if (audioPlayer) audioPlayer->playNavigationSound(); 

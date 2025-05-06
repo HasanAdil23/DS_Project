@@ -1,16 +1,20 @@
 ﻿#include <SFML/Graphics.hpp>
 #include "login_signup.h"
 #include "menu.h"
+#include "player_profile.h"
 #include "endmenu.h"
 #include "gameaudio.h"
 #include "scoresystem.h"
 #include <iostream>
 #include <time.h>
+
 using namespace sf;
 using namespace std;
 
 const int M = 25;
 const int N = 40;
+
+PlayerProfile loginPlayer;
 
 int grid[M][N] = { 0 };
 int ts = 18; //tile size
@@ -67,8 +71,9 @@ int main()
 
     // --- Proceeding to Login/Signup before starting the game ---
 
-    if (!handleAuthentication(window))
+    if (!handleAuthentication(window, loginPlayer.name, loginPlayer.ID))
         return 0;
+
     //this is a goto label, that i have created. used when user returns from the exitscreen
 exit:
     // Reset grid to initial state (added because of the end menu)
@@ -84,19 +89,26 @@ exit:
         menuChoice = menu.handleInput();
         menu.drawMenu();
 
-        if (menuChoice == 1) 
+        if (menuChoice == 1)
         {
-            std::cout << "Showing personal highscores:\n";
+            //PlayerProfile profile(loginPlayer.name, loginPlayer.ID);
+            loginPlayer.setupProfile();
+            loginPlayer.showProfile(window);
+        }
+
+        else if (menuChoice == 2) 
+        {
+            cout << "Showing personal highscores:\n";
             ScoreSystem tempScores;
             tempScores.loadFromFile();
             menuChoice = -2;
         }
-        else if (menuChoice == 2) 
+        else if (menuChoice == 3) 
         {
-            std::cout << "Showing leaderboard (not implemented yet)\n";
+            cout << "Showing leaderboard (not implemented yet)\n";
             menuChoice = -2;
         }
-        else if (menuChoice == 3) 
+        else if (menuChoice == 4) 
         {
             menu.audioPlayer->playQuitSoundAndExit(window); //windows xp wali awaaz yahan se chalti hai 
             window.close();
@@ -306,7 +318,7 @@ exit:
                 choice = endMenu.handleInput();
                 endMenu.draw();
             }
-            // choice will always be 0 → Return to main
+            // choice will always be 0 to Return to main
             goto exit; // to restart at the main menu
             
 
