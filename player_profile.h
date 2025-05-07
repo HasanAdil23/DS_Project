@@ -7,20 +7,17 @@
 #include <ctime>
 #include <cstdlib>
 
-
-
 using namespace std;
 using namespace sf;
 
-class PlayerProfile {
+class PlayerProfile
+{
 public:
     string name;
     string ID;
     int totalScore;
     string theme; 
-
-    //Texture backgroundTexture;
-    //Sprite backgroundSprite;
+    
     Font font;
     Text nameText, idText, scoreText, themeText, titleText;
 
@@ -62,8 +59,6 @@ public:
         name = Pname;
         ID = Pid;
         theme = "";
-
-        
 
         if (!font.loadFromFile("Fonts/super-legend-boy-font/SuperLegendBoy-4w8Y.ttf"))
         {

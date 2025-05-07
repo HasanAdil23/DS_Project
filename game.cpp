@@ -70,6 +70,7 @@ int main()
 
     RenderWindow window(VideoMode(N * ts, M * ts), "XONIX");
     window.setFramerateLimit(60);
+    LeaderboardManager ldboard(window);
 
     // --- Proceeding to Login/Signup before starting the game ---
 
@@ -100,24 +101,9 @@ exit:
 
         else if (menuChoice == 2)
         {
-            bool back = false;
-            while (!back && window.isOpen())
-            {
-                Event e;
-                while (window.pollEvent(e)) 
-                {
-                    if (e.type == Event::Closed)
-                        window.close();
-                    else if (e.type == Event::KeyPressed && e.key.code == Keyboard::Escape)
-                        back = true;
-                }
-
-                window.clear();
-           
-            }
-            menuChoice = -2; // Return to menu loop
+            ldboard.displayLeaderboard(window);
+            menuChoice = -2;
         }
-
 
         else if (menuChoice == 3) 
         {
