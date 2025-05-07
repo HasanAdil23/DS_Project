@@ -3,6 +3,7 @@
 #include "menu.h"
 #include "player_profile.h"
 #include "endmenu.h"
+#include "gamestate.h"
 #include "gameaudio.h"
 #include <string>
 #include "leaderboardMgmt.h"
@@ -71,6 +72,7 @@ int main()
     RenderWindow window(VideoMode(N * ts, M * ts), "XONIX");
     window.setFramerateLimit(60);
     LeaderboardManager ldboard(window);
+    GameState currentState;
 
     // --- Proceeding to Login/Signup before starting the game ---
 
@@ -192,6 +194,18 @@ exit:
                     freezeTimer = 3.0; // 3 seconds
                 }
             }
+            if (e.type == Event::KeyPressed && e.key.code == Keyboard::S) {
+                currentState.timestamp = getCurrentTimestamp();
+                currentState.playerID = loginPlayer.ID;
+
+                std::string saveID;
+                std::cout << "Enter Save ID: ";
+                std::cin >> saveID;
+
+                saveGameState(currentState, saveID);
+                std::cout << "Game saved successfully!\n";
+            }
+
         }
 
         if (Keyboard::isKeyPressed(Keyboard::Left)) { dx = -1; dy = 0; }
@@ -214,6 +228,7 @@ exit:
             if (grid[y][x] == 0) 
             {
                 grid[y][x] = 2;
+                currentState.addTile(x, y);
                 scoreSystem.addPoints(1);  // <-- Add points for claiming tile
             }
 

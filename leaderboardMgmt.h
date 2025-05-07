@@ -48,18 +48,7 @@ private:
 public:
     minheap() : size(0) {}
 
-    void insertOrUpdate(int id, int scoreVal, const string& name) {
-        for (int i = 0; i < size; ++i) {
-            if (heap[i].id == id) {
-                if (scoreVal > heap[i].pscore) {
-                    heap[i].pscore = scoreVal;
-                    heap[i].name = name;
-                    heapifyDown(i);
-                    heapifyUp(i);
-                }
-                return;
-            }
-        }
+    void insertScore(int id, int scoreVal, const string& name) {
         if (size < maxsize) {
             heap[size].id = id;
             heap[size].pscore = scoreVal;
@@ -75,6 +64,7 @@ public:
         }
     }
 
+
     void writeToFile() {
         ofstream outFile("leaderboard.txt");
         if (!outFile.is_open()) return;
@@ -87,8 +77,10 @@ public:
         string name;
         int id, scoreVal;
         if (!file.is_open()) return;
-        while (file >> name >> id >> scoreVal) {
-            insertOrUpdate(id, scoreVal, name);
+        while (file >> name >> id >> scoreVal)
+        {
+            insertScore(id, scoreVal, name);
+
         }
     }
 
@@ -148,8 +140,9 @@ public:
     }
 
     // Call after a game ends
-    void updateAfterMatch(int id, int scoreVal, const string& name) {
-        heap.insertOrUpdate(id, scoreVal, name);
+    void updateAfterMatch(int id, int scoreVal, const string& name) 
+    {
+        heap.insertScore(id, scoreVal, name);
         heap.writeToFile();
         updateText();
     }
