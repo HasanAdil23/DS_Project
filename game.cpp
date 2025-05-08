@@ -3,8 +3,8 @@
 #include "menu.h"
 #include "player_profile.h"
 #include "endmenu.h"
-#include "gamestate.h"
 #include "gameaudio.h"
+#include "gamestate.h"
 #include <string>
 #include "leaderboardMgmt.h"
 #include "scoresystem.h"
@@ -72,8 +72,7 @@ int main()
     RenderWindow window(VideoMode(N * ts, M * ts), "XONIX");
     window.setFramerateLimit(60);
     LeaderboardManager ldboard(window);
-    GameState currentState;
-
+   
     // --- Proceeding to Login/Signup before starting the game ---
 
     if (!handleAuthentication(window, loginPlayer.name, loginPlayer.ID))
@@ -148,6 +147,29 @@ exit:
     ScoreSystem scoreSystem(stoi(loginPlayer.ID), loginPlayer.name); // replace insertusername with actual name string
 
     menu.stopaudio();   //stopping the menu audio
+    GameState currentState(stoi(loginPlayer.ID));
+
+    /////////////SAVE GAME\\\\\\\\\\\ 
+    if (currentState.hasSavedGame(stoi(loginPlayer.ID)))
+    {
+        if (currentState.promptResumeSFML(window))
+        {
+            // Resume by placing tiles from saved state
+            tilenode* curr = currentState.getHead();
+            while (curr)
+            {
+                if (curr->grid)
+                    grid[curr->y][curr->x] = 2;  // Assuming '2' is trail or claimed path
+                curr = curr->next;
+            }
+            cout << "Resumed previous game state.\n";
+            cout << "Printing linked list for debugging" << endl;
+            currentState.printList();
+        }
+        else cout << "starting new game" << endl;
+
+    }
+    
     audio.playBackgroundMusic();    //playing the game music
     // Main Game Loop
     while (window.isOpen()) 
@@ -194,18 +216,28 @@ exit:
                     freezeTimer = 3.0; // 3 seconds
                 }
             }
-            if (e.type == Event::KeyPressed && e.key.code == Keyboard::S) {
-                currentState.timestamp = getCurrentTimestamp();
-                currentState.playerID = loginPlayer.ID;
 
-                std::string saveID;
-                std::cout << "Enter Save ID: ";
-                std::cin >> saveID;
-
-                saveGameState(currentState, saveID);
-                std::cout << "Game saved successfully!\n";
+            //save game 
+            if (e.type == Event::KeyPressed && e.key.code == Keyboard::S)
+            {
+                Font font;
+                currentState.saveStateToFile();
+                if (!font.loadFromFile("Fonts/super-legend-boy-font/SuperLegendBoy-4w8Y.ttf"))
+                {
+                    cerr << "Failed to load font for resume prompt\n";
+                }
+				Text saveText;
+				saveText.setFont(font);
+				saveText.setString("Save ID: " + to_string(currentState.getsaveID()));
+				saveText.setCharacterSize(24);
+				saveText.setFillColor(Color::White);
+				saveText.setPosition(100, 100);
+				window.draw(saveText);
+				window.display();
+				sf::sleep(sf::seconds(10.0f)); // 10 second pause before clearing the message
+				window.clear();
             }
-
+           
         }
 
         if (Keyboard::isKeyPressed(Keyboard::Left)) { dx = -1; dy = 0; }
