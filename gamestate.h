@@ -79,21 +79,18 @@ public:
         node->next = head;
         head = node;
     }
-
-    void saveStateToFile() {
+    void saveStateToFile()
+    {
         saveID = static_cast<long>(time(nullptr));
 
-        std::filesystem::create_directory("saves");
-
         char filename[64];
-        sprintf_s(filename, "saves/%d.txt", playerID);
+        sprintf_s(filename, "%d.txt", playerID);
         ofstream file(filename);
         if (!file.is_open()) {
             cerr << "Error: Unable to open save file for writing\n";
             return;
         }
         else cout << "file opened in savestateToFile()" << endl;
-
         file << playerID << "\n";
         file << saveID << "\n";
 
@@ -110,7 +107,7 @@ public:
         clearList();
 
         char filename[64];
-        sprintf_s(filename, "saves/%ld.txt", id);
+        sprintf_s(filename, "%ld.txt", id);
         ifstream file(filename);
         if (!file.is_open()) {
             cerr << "Error: Save file not found.\n";
@@ -120,7 +117,6 @@ public:
 
         file >> playerID;
         file >> saveID;
-
         int x, y, flag;
         while (file >> x >> y >> flag) {
             addTile(x, y, flag == 1);
@@ -129,6 +125,7 @@ public:
         cout << "Game loaded from Save ID: " << saveID << endl;
         return true;
     }
+
     bool hasSavedGame(int id) {
         char filename[64];
         sprintf_s(filename, "%d.txt", id);
