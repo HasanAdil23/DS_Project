@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -28,7 +28,14 @@ private:
 
     
 public:
-    
+    void setScore(int s) 
+    {
+        score = s;
+        std::ostringstream ss;
+        ss << "Score: " << score;
+        scoreText.setString(ss.str());
+    }
+
     void addPoints(int points);
     int getScore()const ;
 

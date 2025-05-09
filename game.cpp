@@ -159,16 +159,26 @@ exit:
             while (curr)
             {
                 if (curr->grid)
-                    grid[curr->y][curr->x] = 2;  // Assuming '2' is trail or claimed path
+                    grid[curr->y][curr->x] = 1;  
                 curr = curr->next;
             }
             cout << "Resumed previous game state.\n";
             cout << "Printing linked list for debugging" << endl;
             currentState.printList();
+            // after your while(curr) loop:
+            
+            scoreSystem.reset();
+            scoreSystem.setScore(currentState.getSavedScore());
         }
         else cout << "starting new game" << endl;
 
     }
+	else
+	{
+        currentState.setSavedScore(0);
+        scoreSystem.reset();
+        scoreSystem.setScore(0);
+	}
     
     audio.playBackgroundMusic();    //playing the game music
     // Main Game Loop
@@ -221,6 +231,7 @@ exit:
             if (e.type == Event::KeyPressed && e.key.code == Keyboard::S)
             {
                 Font font;
+                currentState.setSavedScore(scoreSystem.getScore());
                 currentState.saveStateToFile();
                 if (!font.loadFromFile("Fonts/super-legend-boy-font/SuperLegendBoy-4w8Y.ttf"))
                 {
@@ -260,7 +271,7 @@ exit:
             if (grid[y][x] == 0) 
             {
                 grid[y][x] = 2;
-                currentState.addTile(x, y);
+                currentState.addTile(x, y, 2); // Add tile to linked list
                 scoreSystem.addPoints(1);  // <-- Add points for claiming tile
             }
 

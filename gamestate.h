@@ -25,7 +25,9 @@ private:
     int playerID;             // ID of the player
     tilenode* head;           // Head of the linked list
     long saveID;              // Unique save identifier
+    int savedScore = 0;
 
+   
     void clearList() {
         tilenode* current = head;
         while (current) {
@@ -36,15 +38,21 @@ private:
         head = nullptr;
     }
 
+
+
 public:
+    void clearHistory() 
+    { clearList(); }
     GameState() : playerID(0), head(nullptr), saveID(0) {
         if (!font.loadFromFile("Fonts/super-legend-boy-font/SuperLegendBoy-4w8Y.ttf")) {
             cerr << "Failed to load font for resume prompt\n";
         }
-        if (backgroundTexture.loadFromFile("images/t1.jpg")) {
+        if (backgroundTexture.loadFromFile("images/t1.jpg"))
+        {
             backgroundSprite.setTexture(backgroundTexture);
             backgroundSprite.setColor(Color(255, 255, 255, 100));
         }
+       
     }
 
     GameState(int id) : playerID(id), head(nullptr) {
@@ -66,12 +74,12 @@ public:
         playerID = id;
     }
 
-    int getsaveID()
+    int getsaveID() const
     {
-		return saveID;
-	}
+        return saveID;
+    }
 
-    void addTile(int x, int y, bool isTile = true) {
+    void addTile(int x, int y,   bool isTile = true ) {
         tilenode* node = new tilenode;
         node->x = x;
         node->y = y;
@@ -93,6 +101,7 @@ public:
         else cout << "file opened in savestateToFile()" << endl;
         file << playerID << "\n";
         file << saveID << "\n";
+        file << savedScore << "\n";
 
         tilenode* curr = head;
         while (curr) {
@@ -117,14 +126,23 @@ public:
 
         file >> playerID;
         file >> saveID;
+        file >> savedScore;
+
         int x, y, flag;
-        while (file >> x >> y >> flag) {
+        while (file >> x >> y >> flag)
+        {
             addTile(x, y, flag == 1);
         }
         file.close();
         cout << "Game loaded from Save ID: " << saveID << endl;
         return true;
     }
+   
+    int getSavedScore() const 
+    { return savedScore; }
+    
+    void setSavedScore(int score)
+    { savedScore = score; }
 
     bool hasSavedGame(int id) {
         char filename[64];
@@ -133,7 +151,7 @@ public:
         return file.good();
     }
 
-    void printList() 
+    void printList()
     {
         tilenode* curr = head;
         while (curr) {
@@ -143,7 +161,26 @@ public:
         cout << "NULL\n";
     }
 
-    bool promptResumeSFML(RenderWindow& window) 
+    bool checkSaveID(long id, int playerID)
+    {
+        char filename[64];
+        sprintf_s(filename, "%d.txt", playerID);
+        ifstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Error: Save file not found.\n";
+            return false;
+        }
+
+        int dummyPlayerID;
+        long storedSaveID;
+        file >> dummyPlayerID;     // skip player ID
+        file >> storedSaveID;      // read actual save ID
+        file.close();
+
+        return (storedSaveID == id);
+    }
+
+    bool promptResumeSFML(RenderWindow& window)
     {
         Vector2u textureSize = backgroundTexture.getSize();
         Vector2u windowSize = window.getSize();
@@ -157,6 +194,10 @@ public:
         prompt.setPosition(50, 100);
         prompt.setFillColor(Color::Yellow);
 
+        Text errorMsg("", font, 18);
+        errorMsg.setFillColor(Color::Red);
+        errorMsg.setPosition(50, 220);
+
         Text inputDisplay("", font, 30);
         inputDisplay.setPosition(100, 160);
         inputDisplay.setFillColor(Color::Yellow);
@@ -164,8 +205,10 @@ public:
         while (window.isOpen()) {
             Event event;
             while (window.pollEvent(event)) {
-                if (event.type == Event::Closed) return false;
-                if (event.type == Event::TextEntered) {
+                if (event.type == Event::Closed) 
+                    return false;
+                if (event.type == Event::TextEntered)
+                {
                     if ((event.text.unicode >= '0' && event.text.unicode <= '9') || event.text.unicode == '-') {
                         inputText += static_cast<char>(event.text.unicode);
                     }
@@ -175,9 +218,15 @@ public:
                 }
                 else if (event.type == Event::KeyPressed && event.key.code == Keyboard::Enter) {
                     if (!inputText.empty()) {
+
                         long id = stol(inputText);
+                        if (!checkSaveID(id, playerID))
+                        {
+                            errorMsg.setString("Invalid Save ID. Try again.");
+                        }
                         if (id == -1) return false;
-                        return loadStateFromFile(playerID);
+                        
+                        return  loadStateFromFile(playerID);
                     }
                 }
             }
@@ -187,6 +236,7 @@ public:
             window.draw(backgroundSprite);
             window.draw(prompt);
             window.draw(inputDisplay);
+            window.draw(errorMsg);
             window.display();
         }
         return false;
@@ -196,3 +246,4 @@ public:
         return head;
     }
 };
+
