@@ -68,17 +68,17 @@ void GameMenu::loadResources()
 // Setup menu items
 // Setup menu items
 void GameMenu::setupMenu() {
-    std::string options[] = { "PLAY", "Profile", "Leaderboard", "QUIT" }; 
+    std::string options[] = { "PLAY", "Profile", "Leaderboard", "Friends", "QUIT" }; 
     float windowWidth = 40 * 18;
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 5; ++i) {
         menuItems[i].setFont(font);
         menuItems[i].setString(options[i]);
         menuItems[i].setCharacterSize(30);
 
         sf::FloatRect textRect = menuItems[i].getLocalBounds();
         float x = (windowWidth - textRect.width) / 2.f;
-        float y = 150 + i * 60;
+        float y = 150 + i * 52;
 
         menuItems[i].setPosition(x, y);
         menuItems[i].setFillColor(i == 0 ? sf::Color::Yellow : sf::Color::White);
@@ -90,10 +90,10 @@ void GameMenu::navigateMenu(sf::Keyboard::Key key) {
     menuItems[selectedItemIndex].setFillColor(sf::Color::White);
 
     if (key == sf::Keyboard::Up) {
-        selectedItemIndex = (selectedItemIndex - 1 + 4) % 4; 
+        selectedItemIndex = (selectedItemIndex - 1 + 5) % 5; 
     }
     else if (key == sf::Keyboard::Down) {
-        selectedItemIndex = (selectedItemIndex + 1) % 4; 
+        selectedItemIndex = (selectedItemIndex + 1) % 5; 
     }
 
     if (audioPlayer) audioPlayer->playNavigationSound();
@@ -166,7 +166,7 @@ void GameMenu::drawMenu() {
     window.draw(titleText);
 
     // Draw menu options
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < 5; ++i)
         window.draw(menuItems[i]);
 
     window.display();

@@ -83,7 +83,7 @@ public:
 
         loadPlayerScore();
 
-        setupText(titleText, "Player Profile", 235, 50, 32);
+        setupText(titleText, "Player Profile", 205, 50, 32);
         setupText(nameText, "Name: " + name, 175, 120);
         setupText(idText, "Player ID: " + ID, 175, 170);
         setupText(scoreText, "Total Score: " + to_string(totalScore), 175, 220);

@@ -5,6 +5,7 @@
 #include "endmenu.h"
 #include "gameaudio.h"
 #include "gamestate.h"
+#include "friend_system.h"
 #include <string>
 #include "leaderboardMgmt.h"
 #include "scoresystem.h"
@@ -18,6 +19,7 @@ const int M = 25;
 const int N = 40;
 
 PlayerProfile loginPlayer;
+PlayerManager pm;
 
 int grid[M][N] = { 0 };
 int ts = 18; //tile size
@@ -78,6 +80,18 @@ int main()
     if (!handleAuthentication(window, loginPlayer.name, loginPlayer.ID))
         return 0;
 
+    loadAllPlayers(pm);
+    pm.addPlayer(loginPlayer.ID, loginPlayer.name);
+
+    cout << "Player added: " << loginPlayer.ID << endl;
+
+    pm.loadFriendData("friends.txt");
+    pm.loadPendingRequests("pending.txt");
+
+    cout << "Loading friend data...\n";
+    cout << "Loading pending request data...\n";
+
+
     //this is a goto label, that i have created. used when user returns from the exitscreen
 exit:
     // Reset grid to initial state (added because of the end menu)
@@ -108,9 +122,28 @@ exit:
 
         else if (menuChoice == 3) 
         {
+            Font font;
+            font.loadFromFile("Fonts/super-legend-boy-font/SuperLegendBoy-4w8Y.ttf");
+            cout << "Opening Friend Menu\n";  //
+            Player* me = pm.findPlayer(loginPlayer.ID);
+            if (me) {
+                showFriendMenu(window, pm, me, font);
+            }
+            else {
+                cout << "Player not found!\n";
+            }
+            menuChoice = -2;
+        } 
+
+        else if (menuChoice == 4)
+        {
+            pm.saveFriendData("friends.txt");
+            pm.savePendingRequests("pending.txt");
+            cout << "Saved friend and pending request data.\n";
+
             menu.audioPlayer->playQuitSoundAndExit(window); //windows xp wali awaaz yahan se chalti hai 
             window.close();
-        } 
+        }
     }
 
     if (menuChoice != 0 || !window.isOpen())
@@ -385,5 +418,10 @@ exit:
         window.display();
 
     }
+
+    /*pm.saveFriendData("friends.txt");
+    pm.savePendingRequests("pending.txt");
+    cout << "Saving friend data ... \n";*/
+
     return 0;
 }
