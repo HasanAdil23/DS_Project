@@ -16,10 +16,11 @@ public:
     string name;
     string ID;
     int totalScore;
-    string theme; 
-    
+    string theme;
+    int preferredThemeID;
     Font font;
     Text nameText, idText, scoreText, themeText, titleText;
+    int themeid;
 
     void loadPlayerScore()
     {
@@ -87,7 +88,23 @@ public:
         setupText(nameText, "Name: " + name, 175, 120);
         setupText(idText, "Player ID: " + ID, 175, 170);
         setupText(scoreText, "Total Score: " + to_string(totalScore), 175, 220);
-        setupText(themeText, "Theme: (Coming Soon)", 175, 270);
+        if (themeid == 1)
+        {
+            setupText(themeText, "Theme: Classic", 175, 270);
+        }
+        else if (themeid == 2)
+		{
+			setupText(themeText, "Theme: Apocalypse", 175, 270);
+		}
+		else if (themeid == 3)
+		{
+			setupText(themeText, "Theme: Genesis", 175, 270);
+		}
+		else
+		{
+			setupText(themeText, "Theme: 1984", 175, 270);
+		}
+        
     }
 
     void showProfile(RenderWindow& window)

@@ -6,6 +6,7 @@
 #include "gameaudio.h"
 #include "gamestate.h"
 #include "friend_system.h"
+#include "inventory.h"
 #include <string>
 #include "leaderboardMgmt.h"
 #include "scoresystem.h"
@@ -27,7 +28,28 @@ int ts = 18; //tile size
 //powerup 
 bool enemiesFrozen = false;
 float freezeTimer = 0.0f;
+int Gtheme = 1;
 
+void settheme(Texture& t, int id)
+{
+    //setting enemy sprites
+    if (id == 1)
+    {
+        t.loadFromFile("images/enemy.png");
+    }
+    else if (id == 2)
+    {
+        t.loadFromFile("images/xonix_e2.png");
+    }
+    else if (id == 3)
+    {
+        t.loadFromFile("images/xonix_e1.png");
+    }
+    else if (id == 4)
+    {
+        t.loadFromFile("images/xonix_e3.png");
+    }
+}
 
 struct Enemy
 {
@@ -91,6 +113,14 @@ int main()
     cout << "Loading friend data...\n";
     cout << "Loading pending request data...\n";
 
+    // Load game assets
+    //using the global theme variable to set the enemy 
+    //t3 is the enemy 
+    Texture t1, t2, t3;
+    t1.loadFromFile("images/tiles.png");
+    t2.loadFromFile("images/gameover.png");
+    settheme(t3, 1); //passing the default theme for now, in case the user does not go to the inventory 
+
 
     //this is a goto label, that i have created. used when user returns from the exitscreen
 exit:
@@ -110,6 +140,7 @@ exit:
         if (menuChoice == 1)
         {
             //PlayerProfile profile(loginPlayer.name, loginPlayer.ID);
+            loginPlayer.themeid = Gtheme;//themeid has been passed for display
             loginPlayer.setupProfile();
             loginPlayer.showProfile(window);
         }
@@ -134,13 +165,29 @@ exit:
             }
             menuChoice = -2;
         } 
-
-        else if (menuChoice == 4)
+        
+		else if (menuChoice == 4)
+        {
+            cout << "Opening Inventory Menu\n";
+            // Load the AVL tree with default themes
+            AVLTree tree;
+            loadDefaultThemes(tree);
+            // Show inventory window
+            int selectedThemeID = showInventoryWindow(window, tree);
+            if (selectedThemeID != -1) 
+            {
+                cout << "Selected Theme ID: " << selectedThemeID << endl;
+                Gtheme = selectedThemeID;//setting the global theme variable
+                cout<<"Theme ID set to: " << Gtheme << endl;
+            }
+            settheme(t3, Gtheme); // Load enemy texture based on selected theme
+        }
+        else if (menuChoice == 5)
         {
             pm.saveFriendData("friends.txt");
             pm.savePendingRequests("pending.txt");
             cout << "Saved friend and pending request data.\n";
-
+            cout << "wo bhi apne na huay, dil bhi gaya haathon se" << endl;
             menu.audioPlayer->playQuitSoundAndExit(window); //windows xp wali awaaz yahan se chalti hai 
             window.close();
         }
@@ -152,12 +199,7 @@ exit:
         return 0;
     }
 
-    // Load game assets
-    Texture t1, t2, t3;
-    t1.loadFromFile("images/tiles.png");
-    t2.loadFromFile("images/gameover.png");
-    t3.loadFromFile("images/enemy.png");
-
+    
     Sprite sTile(t1), sGameover(t2), sEnemy(t3);
     sGameover.setPosition(100, 100);
     sEnemy.setOrigin(20, 20);
@@ -198,8 +240,6 @@ exit:
             cout << "Resumed previous game state.\n";
             cout << "Printing linked list for debugging" << endl;
             currentState.printList();
-            // after your while(curr) loop:
-            
             scoreSystem.reset();
             scoreSystem.setScore(currentState.getSavedScore());
         }
