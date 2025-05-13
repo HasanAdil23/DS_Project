@@ -163,15 +163,26 @@ int showInventoryWindow(RenderWindow& window, AVLTree& tree) {
     Texture backgroundTexture;
     Sprite backgroundSprite; 
     Font font;
+    if (!backgroundTexture.loadFromFile("images/t1.jpg"))
+    {
+        std::cerr << "Failed to load background image\n";
+    }
+    else 
+    {
+        backgroundSprite.setTexture(backgroundTexture);
+        backgroundSprite.setColor(sf::Color(255, 255, 255, 100)); // Optional: transparency
+
+        Vector2u textureSize = backgroundTexture.getSize();
+        Vector2u windowSize = window.getSize();
+        backgroundSprite.setScale(
+            float(windowSize.x) / textureSize.x,
+            float(windowSize.y) / textureSize.y
+        );
+    }
     if (!font.loadFromFile("Fonts/super-legend-boy-font/SuperLegendBoy-4w8Y.ttf"))
     {
         std::cerr << "Failed to load font.\n";
         return -1;
-    }
-
-    if (!backgroundTexture.loadFromFile("images/t1.jpg"))
-    {
-        std::cerr << "Failed to load background image\n";
     }
 
     Theme* themeList = nullptr;
@@ -207,7 +218,7 @@ int showInventoryWindow(RenderWindow& window, AVLTree& tree) {
         }
 
         window.clear(Color::Black);
-
+        window.draw(backgroundSprite);
         for (int i = 0; i < themeCount; ++i) 
         {
             sf::Text text;
