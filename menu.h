@@ -12,7 +12,7 @@ private:
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
     sf::Font font;
-    sf::Text menuItems[6];
+    sf::Text menuItems[7];
     int selectedItemIndex=-1;
     bool showAnimationDone = false;
 
@@ -54,32 +54,31 @@ void GameMenu::loadResources()
 
         Vector2u textureSize = backgroundTexture.getSize();
         Vector2u windowSize = window.getSize();
-        backgroundSprite.setScale(
-            float(windowSize.x) / textureSize.x,
-            float(windowSize.y) / textureSize.y
-        );
+        backgroundSprite.setScale(float(windowSize.x) / textureSize.x, float(windowSize.y) / textureSize.y);
     }
     
     if (!font.loadFromFile("Fonts/super-legend-boy-font/SuperLegendBoy-4w8Y.ttf"))
     {
-        std::cerr << "Failed to load font\n";
+        cout << "Failed to load font\n";
         cout << "font load nahi hota tumse, usko manao ge" << endl;
     }
 }
 
-// Setup menu items
-void GameMenu::setupMenu() {
-    std::string options[] = { "PLAY", "Profile", "Leaderboard", "Friends", "Inventory", "QUIT" };
+// Seting up the menu items
+void GameMenu::setupMenu()
+{
+    std::string options[] = { "PLAY", "Multiplayer", "Profile", "Leaderboard", "Friends", "Inventory", "QUIT" };
     float windowWidth = 40 * 18;
 
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < 7; ++i) 
+    {
         menuItems[i].setFont(font);
         menuItems[i].setString(options[i]);
-        menuItems[i].setCharacterSize(28);
+        menuItems[i].setCharacterSize(26);
 
         sf::FloatRect textRect = menuItems[i].getLocalBounds();
         float x = (windowWidth - textRect.width) / 2.f;
-        float y = 150 + i * 48;
+        float y = 150 + i * 42;
 
         menuItems[i].setPosition(x, y);
         menuItems[i].setFillColor(i == 0 ? sf::Color::Yellow : sf::Color::White);
@@ -87,15 +86,15 @@ void GameMenu::setupMenu() {
 }
 
 
-// Navigate through menu items
+// For Navigating through menu items
 void GameMenu::navigateMenu(sf::Keyboard::Key key) {
     menuItems[selectedItemIndex].setFillColor(sf::Color::White);
 
     if (key == sf::Keyboard::Up) {
-        selectedItemIndex = (selectedItemIndex - 1 + 6) % 6;
+        selectedItemIndex = (selectedItemIndex - 1 + 7) % 7;
     }
     else if (key == sf::Keyboard::Down) {
-        selectedItemIndex = (selectedItemIndex + 1) % 6;
+        selectedItemIndex = (selectedItemIndex + 1) % 7;
     }
 
     if (audioPlayer) audioPlayer->playNavigationSound();
@@ -105,18 +104,24 @@ void GameMenu::navigateMenu(sf::Keyboard::Key key) {
 
 
 // Handle keyboard input
-int GameMenu::handleInput() {
+int GameMenu::handleInput()
+{
     sf::Event event;
-    while (window.pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
+    while (window.pollEvent(event))
+    {
+        if (event.type == sf::Event::Closed) 
+        {
             window.close();
             return -1;
         }
-        if (event.type == sf::Event::KeyPressed) {
-            if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down) {
+        if (event.type == sf::Event::KeyPressed)
+        {
+            if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down) 
+            {
                 navigateMenu(event.key.code);
             }
-            else if (event.key.code == sf::Keyboard::Enter) {
+            else if (event.key.code == sf::Keyboard::Enter) 
+            {
                 return selectedItemIndex;
             }
         }
@@ -124,8 +129,9 @@ int GameMenu::handleInput() {
     return -2;
 }
 
-// Draw background, title, and menu
-void GameMenu::drawMenu() {
+// Drawing background, title, and menu
+void GameMenu::drawMenu() 
+{
     window.clear();
     window.draw(backgroundSprite);
 
@@ -137,11 +143,13 @@ void GameMenu::drawMenu() {
     titleText.setFillColor(sf::Color::Red);
     titleText.setPosition(windowWidth / 2.f, yPos);
 
-    if (!showAnimationDone) {
+    if (!showAnimationDone) 
+    {
         std::string title = "XONIX";
         Clock letterClock;
 
-        for (int  i = 0; i < title.size(); ++i) {
+        for (int  i = 0; i < title.size(); ++i) 
+        {
             while (letterClock.getElapsedTime().asSeconds() < (i + 1) * 0.2f) 
             {
                 window.clear();
@@ -161,15 +169,15 @@ void GameMenu::drawMenu() {
         showAnimationDone = true;
     }
 
-    // Draw full title
+    // For drawing main title
     titleText.setString("XONIX");
     sf::FloatRect finalBounds = titleText.getLocalBounds();
     titleText.setOrigin(finalBounds.width / 2.f, finalBounds.height / 2.f);
     titleText.setPosition(windowWidth / 2.f, yPos);
     window.draw(titleText);
 
-    // Draw menu options
-    for (int i = 0; i < 6; ++i)
+    // Drawing menu options
+    for (int i = 0; i < 7; ++i)
         window.draw(menuItems[i]);
 
     window.display();

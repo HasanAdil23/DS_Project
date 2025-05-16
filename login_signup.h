@@ -1,3 +1,7 @@
+#ifndef LOGIN_SIGNUP_H
+#define LOGIN_SIGNUP_H
+
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <fstream>
@@ -10,7 +14,7 @@
 using namespace sf;
 using namespace std;
 
-bool handleAuthentication(RenderWindow& window, string &loginName, string &loginID) 
+bool handleAuthentication(RenderWindow& window, string &loginName, string &loginID, string &loginPass) 
 {
     enum Screens { LOGIN, SIGNUP };
     Screens currentScreen = LOGIN;
@@ -120,6 +124,7 @@ bool handleAuthentication(RenderWindow& window, string &loginName, string &login
 
                                 loginName = inputName;     //for player profile
                                 loginID = to_string(id);   //for player profile
+                                loginPass = inputPass;
 
                                 found = true;
                                 break;
@@ -362,3 +367,5 @@ bool handleAuthentication(RenderWindow& window, string &loginName, string &login
 
     return false;
 }
+
+#endif

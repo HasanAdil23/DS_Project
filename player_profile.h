@@ -15,6 +15,7 @@ class PlayerProfile
 public:
     string name;
     string ID;
+    string password;
     int totalScore;
     string theme;
     int preferredThemeID;
@@ -52,13 +53,15 @@ public:
     {
         name = "";
         ID = "";
+        password = "";
         theme = "";
     }
 
-    PlayerProfile(const string& Pname, const string& Pid) 
+    PlayerProfile(const string& Pname, const string& Pid, const string& Pass) 
     {
         name = Pname;
         ID = Pid;
+        password = Pass;
         theme = "";
 
         if (!font.loadFromFile("Fonts/super-legend-boy-font/SuperLegendBoy-4w8Y.ttf"))
